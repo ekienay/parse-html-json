@@ -3,22 +3,27 @@ package com.def.module;
 import com.def.entity.Hero;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriter;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class HTMLParser {
     public static void parseHTML(URL url) {
 
         Document document;
         try {
+            UUID uuid = UUID.randomUUID();
 
             document = Jsoup.connect(String.valueOf(url)).get();
 
@@ -26,30 +31,26 @@ public class HTMLParser {
             Elements names = blocks.select("p.card-body__headline");
             Elements figure = document.select("figure.img__wrapper ");
             Elements img = figure.select("img[mvl-type=explore]");
-            String src = img.attr("src");
-            System.out.println(src);
 
-            URLConnection openConnection = null;
-
-           for (int i = 0; i < img.size(); i++){
-               openConnection = new URL(img.attr("src")).openConnection();
-           }
-            assert openConnection != null;
-            openConnection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
             String namesLine = names.text();
             String[] toSplit = namesLine.split(" ");
             List<Hero> personList = new ArrayList<>();
 
-            BufferedImage image = ImageIO.read(openConnection.getInputStream());
+            File file;
 
-            File file = null;
             for (String s : toSplit) {
                 personList.add(new Hero(s));
-                file = new File("/home/images/" + s);
             }
-            if (file != null){
-                file.createNewFile();
-                ImageIO.write(image, "jpg", file);
+
+            URLConnection openConnection;
+            BufferedImage image;
+            while (img.size() != 0){
+                for (Element element : img){
+                    openConnection = new URL(element.attr("src")).openConnection();
+                    image = ImageIO.read(openConnection.getInputStream());
+                    file = new File("/home/sixtify/images/" + uuid + ".jpg");
+                    ImageIO.write(image, "jpg", file);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
