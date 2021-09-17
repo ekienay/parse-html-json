@@ -7,11 +7,11 @@ import java.net.URL;
 
 public class JSONParser {
 
-    public static String parseJSON(URL url){
+    public static String parseJSON(URL url) {
         StringBuilder sb = new StringBuilder();
-        try(BufferedReader bf = new BufferedReader(new InputStreamReader(url.openStream()))){
+        try (BufferedReader bf = new BufferedReader(new InputStreamReader(url.openStream()))) {
             String line;
-            while ((line = bf.readLine()) != null){
+            while ((line = bf.readLine()) != null) {
                 sb.append(line);
             }
         } catch (IOException e) {
