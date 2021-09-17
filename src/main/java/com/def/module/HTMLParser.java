@@ -7,10 +7,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -19,11 +17,9 @@ import java.util.List;
 import java.util.UUID;
 
 public class HTMLParser {
-    public static void parseHTML(URL url) {
-
+    public  static void parseHTML(URL url) {
         Document document;
         try {
-            UUID uuid = UUID.randomUUID();
 
             document = Jsoup.connect(String.valueOf(url)).get();
 
@@ -44,14 +40,12 @@ public class HTMLParser {
 
             URLConnection openConnection;
             BufferedImage image;
-            while (img.size() != 0){
                 for (Element element : img){
                     openConnection = new URL(element.attr("src")).openConnection();
                     image = ImageIO.read(openConnection.getInputStream());
-                    file = new File("/home/sixtify/images/" + uuid + ".jpg");
+                    file = new File("/home/sixtify/images/" + UUID.randomUUID() + ".jpg");
                     ImageIO.write(image, "jpg", file);
                 }
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
