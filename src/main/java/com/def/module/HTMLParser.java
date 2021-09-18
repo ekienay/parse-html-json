@@ -23,29 +23,38 @@ public class HTMLParser {
 
             document = Jsoup.connect(String.valueOf(url)).get();
 
-            Elements blocks = document.select("div.card-body is-sliding");
-            Elements names = blocks.select("p.card-body__headline");
-            Elements figure = document.select("figure.img__wrapper ");
-            Elements img = figure.select("img[mvl-type=explore]");
+            Elements contentGrid = document.select("div[class=content-grid content-grid--light]");
+            Elements grid = contentGrid.select("div[class=grid-base grid__6]");
+            Elements heroesCards = grid.select("div[class=mvl-card mvl-card--explore]");
+            Elements avatars = grid.select("img[mvl-type=explore]");
 
-            String namesLine = names.text();
-            String[] toSplit = namesLine.split(" ");
             List<Hero> personList = new ArrayList<>();
 
-            File file;
-
-            for (String s : toSplit) {
-                personList.add(new Hero(s));
-            }
+            var ref = new Object() {
+                File file;
+            };
 
             URLConnection openConnection;
             BufferedImage image;
-                for (Element element : img){
-                    openConnection = new URL(element.attr("src")).openConnection();
-                    image = ImageIO.read(openConnection.getInputStream());
-                    file = new File("/home/sixtify/images/" + UUID.randomUUID() + ".jpg");
-                    ImageIO.write(image, "jpg", file);
-                }
+            Hero hero;
+
+            for (Element name : heroesCards){
+                name.select("p[class=card-body__headline]");
+                hero = new Hero();
+                hero.setName(name.text());
+                personList.add(hero);
+            }
+
+            for (Element avatar : avatars){
+                openConnection = new URL(avatar.attr("src")).openConnection();
+                ref.file = new File("/home/sixtify/images/" + UUID.randomUUID() + ".jpg");
+                image = ImageIO.read(openConnection.getInputStream());
+                ImageIO.write(image, "jpg", ref.file);
+                personList.forEach(h -> h.setAvatarImageName(ref.file.getName()));
+            }
+
+            personList.forEach(System.out::println);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
